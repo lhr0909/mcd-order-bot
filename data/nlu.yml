@@ -1,0 +1,27 @@
+version: '2.0'
+
+nlu:
+  - intent: greet
+    examples: |
+      - 你好
+      - 你好吗
+      - 在吗
+      - 早上好
+      - 晚上好
+  - intent: goodbye
+    examples: |
+      - 再见
+      - 拜拜
+  - intent: affirm
+    examples: |
+      - 是
+      - 是的
+      - 对的
+      - 好的
+      - 没错
+  - intent: deny
+    examples: |
+      - 不
+      - 不是
+      - 没有
+      - 不对

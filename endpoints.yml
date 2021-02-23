@@ -1,0 +1,70 @@
+# This file contains the different endpoints your bot can use.
+
+# Server where the models are pulled from.
+# https://rasa.com/docs/rasa/user-guide/running-the-server/#fetching-models-from-a-server/
+
+#models:
+#  url: http://my-server.com/models/default_core@latest
+#  wait_time_between_pulls:  10   # [optional](default: 100)
+
+# nlg:
+#   url: ${NLG_ENDPOINT}    # url of the nlg endpoint
+  # you can also specify additional parameters, if you need them:
+  # headers:
+  #   my-custom-header: value
+  # token: "my_authentication_token"    # will be passed as a get parameter
+  # basic_auth:
+  #   username: user
+  #   password: pass
+
+# Server which runs your custom actions.
+# https://rasa.com/docs/rasa/core/actions/#custom-actions/
+
+action_endpoint:
+  url: ${ACTION_ENDPOINT}
+  # url: "http://localhost:5055/webhook"
+
+# Tracker store which is used to store the conversations.
+# By default the conversations are stored in memory.
+# https://rasa.com/docs/rasa/api/tracker-stores/
+
+# tracker_store:
+#   type: SQL
+#   dialect: "postgresql+pg8000"  # the dialect used to interact with the db
+#   # url: "localhost"  # (optional) host of the sql db, e.g. "localhost"
+#   # url: ${TRACKER_STORE_HOST}
+#   # port: ${TRACKER_STORE_PORT}
+#   # db: ${TRACKER_STORE_DB}  # path to your db
+#   # username: ${TRACKER_STORE_USERNAME} # username used for authentication
+#   # password: ${TRACKER_STORE_PASSWORD} # password used for authentication
+#   url: localhost
+#   port: 5432
+#   db: bot  # path to your db
+#   username: bot # username used for authentication
+#   password: rules # password used for authentication
+#   # query: # optional dictionary to be added as a query string to the connection URL
+#   #   driver: my-driver
+
+#tracker_store:
+#    type: redis
+#    url: <host of the redis instance, e.g. localhost>
+#    port: <port of your redis instance, usually 6379>
+#    db: <number of your database within redis, e.g. 0>
+#    password: <password used for authentication>
+#    use_ssl: <whether or not the communication is encrypted, default false>
+
+#tracker_store:
+#    type: mongod
+#    url: <url to your mongo instance, e.g. mongodb://localhost:27017>
+#    db: <name of the db within your mongo instance, e.g. rasa>
+#    username: <username used for authentication>
+#    password: <password used for authentication>
+
+# Event broker which all conversation events should be streamed to.
+# https://rasa.com/docs/rasa/api/event-brokers/
+
+#event_broker:
+#  url: localhost
+#  username: username
+#  password: password
+#  queue: queue

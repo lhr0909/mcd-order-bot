@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  # duckling:
+  #   image: rasa/duckling:0.1.6.5
+  #   restart: always
+  #   ports:
+  #     - 8000:8000
+  rasa-chinese-service:
+    # build: .
+    image: rasa-chinese-service:latest
+    ports:
+      - 8001:8000
+    volumes:
+      - bert-cache:/tmp/cache
+    command: hfl/chinese-bert-wwm-ext
+
+volumes:
+  bert-cache:
+    driver: local

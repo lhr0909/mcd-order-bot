@@ -1,0 +1,32 @@
+language: zh
+
+pipeline:
+  - name: "rasa_chinese.nlu.tokenizers.lm_tokenizer.LanguageModelTokenizer"
+    tokenizer_url: http://localhost:8001
+    # Flag to check whether to split intents
+    intent_tokenization_flag: false
+    # Symbol on which intent should be split
+    intent_split_symbol: "_"
+  - name: "components.lm_featurizer.LanguageModelFeaturizer"
+    model_name: "bert"
+    # model_weights: "bert-base-chinese"
+    # model_weights: "./bert-models/chinese_wwm_ext_pytorch"
+    model_weights: hfl/chinese-bert-wwm-ext
+    from_pt: true
+    cache_dir: "./cache"
+  - name: "RegexFeaturizer"
+  - name: "LexicalSyntacticFeaturizer"
+  - name: "CountVectorsFeaturizer"
+  - name: "CountVectorsFeaturizer"
+    analyzer: "char_wb"
+    min_ngram: 1
+    max_ngram: 7
+  - name: "DIETClassifier"
+    epochs: 100
+  - name: "EntitySynonymMapper"
+
+policies:
+  - name: MemoizationPolicy
+  - name: TEDPolicy
+    epochs: 100
+  - name: MappingPolicy
