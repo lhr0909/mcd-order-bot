@@ -33,17 +33,26 @@ async def root():
 
 @app.post('/sessions', response_model=SessionOutput)
 async def create_session(input: SessionInput):
-    session_id = shortuuid.uuid()
+    session_id = 'test'
+    # session_id = shortuuid.uuid()
     session = await playwright.start()
-    browser = await session.chromium.launch(headless=False)
+    browser = await session.chromium.launch_persistent_context(
+        headless=False,
+        user_data_dir='./browsercache',
+        devtools=True,
+    )
     page = await browser.new_page()
     await page.goto('https://mcd.cn')
     await page.click('div.language')
     await page.click('div.languageList > div.title:text("简体中文")')
-    await page.click('div.treaty-plane > img')
-    await page.type('input.txt-phone', input.phone)
-    await page.click('button.countDownBtn')
-    state = 'requested_code'
+
+    await page.wait_for_timeout(1000)
+    await page.click('span:text("开始订餐")')
+    state = 'logged_in'
+    # await page.click('div.treaty-plane > img')
+    # await page.fill('input.txt-phone', input.phone)
+    # await page.click('button.countDownBtn')
+    # state = 'requested_code'
     sessions[session_id] = (session, browser, page, state)
     return SessionOutput(id=session_id, state=state)
 
@@ -51,7 +60,7 @@ async def create_session(input: SessionInput):
 async def login_session(session_id: str, input: LoginInput):
     try:
         session, browser, page, state = sessions[session_id]
-        await page.type('input.txt-sms', input.code)
+        await page.fill('input.txt-sms', input.code)
         await page.click('button.login-button')
         await page.wait_for_timeout(1000)
         await page.click('span:text("开始订餐")')
@@ -65,14 +74,16 @@ async def login_session(session_id: str, input: LoginInput):
 async def order_session(session_id: str, input: OrderInput):
     try:
         session, browser, page, state = sessions[session_id]
-        await page.type('//input[contains(@placeholder, "最多")]', input.query)
+        await page.fill('//input[contains(@placeholder, "最多")]', input.query)
         await page.click('button.ant-input-search-button')
+
+        await page.wait_for_timeout(1000)
 
         items: List[Dict[str, Any]] = []
         if input.is_exact is True:
             # loop through the items and try to match the name
             titles = await page.eval_on_selector_all(
-                'xpath=//div[@class="buy-box"]/div[@class="left"]/p',
+                '//div[@class="buy-box"]/div[@class="left"]/p',
                 '(boxes) => boxes.map(box => box.innerText)',
             )
             print(titles)
@@ -90,6 +101,19 @@ async def order_session(session_id: str, input: OrderInput):
         metadata = {'items': items}
         sessions[session_id] = (session, browser, page, state)
         return SessionOutput(id=session_id, state=state, metadata=metadata)
+    except KeyError:
+        raise HTTPException(state_code=404, detail='session not found')
+
+@app.get('/sessions/{session_id}/cart', response_model=SessionOutput)
+async def get_cart(session_id: str):
+    try:
+        session, browser, page, state = sessions[session_id]
+        cart_count = await page.eval_on_selector(
+            '//div[@class="car"]/span[contains(@class, "ant-badge")]/sup',
+            '(badge) => badge.innerText',
+        )
+        print(cart_count)
+        return SessionOutput(id=session_id, state=state)
     except KeyError:
         raise HTTPException(state_code=404, detail='session not found')
 
