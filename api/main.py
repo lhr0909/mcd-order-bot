@@ -2,12 +2,16 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from playwright.async_api import async_playwright, Playwright, Browser, Page
 import shortuuid
+import cv2
+import numpy as np
 
 from typing import Any, Dict, List, Optional, Tuple
 
 app = FastAPI()
 
 playwright = async_playwright()
+
+qr_decoder = cv2.QRCodeDetector()
 
 sessions: Dict[str, Tuple[Playwright, Browser, Page, str]] = {}
 
@@ -41,7 +45,8 @@ async def create_session(input: SessionInput):
         user_data_dir='./browsercache',
         devtools=True,
     )
-    page = await browser.new_page()
+    page = browser.pages[0]
+    # page = await browser.new_page()
     await page.goto('https://mcd.cn')
     await page.click('div.language')
     await page.click('div.languageList > div.title:text("简体中文")')
@@ -136,7 +141,7 @@ async def order_session(session_id: str, input: OrderInput):
         raise HTTPException(state_code=404, detail='session not found')
 
 @app.post('/sessions/{session_id}/cart/clear', response_model=SessionOutput)
-async def clear_cart(session_id: str):
+async def clear_session_cart(session_id: str):
     try:
         session, browser, page, state = sessions[session_id]
         await page.click('//div[@class="car"]')
@@ -151,7 +156,7 @@ async def clear_cart(session_id: str):
         raise HTTPException(state_code=404, detail='session not found')
 
 @app.get('/sessions/{session_id}/cart', response_model=SessionOutput)
-async def get_cart(session_id: str):
+async def get_session_cart(session_id: str):
     try:
         session, browser, page, state = sessions[session_id]
         cart_price_texts = await page.eval_on_selector_all(
@@ -166,11 +171,11 @@ async def get_cart(session_id: str):
             '//div[@class="othpart time"]/div[@class="center"]/div',
             '(spans) => spans.map((span) => span.innerText)',
         )
-        checkout_button: Dict[str, str] = await page.eval_on_selector(
+        checkout_button_class_dict: Dict[str, str] = await page.eval_on_selector(
             '//button[contains(@class, "to-check")]',
             '(button) => button.classList',
         )
-        if 'grey' in checkout_button.values():
+        if 'grey' in checkout_button_class_dict.values():
             state = 'cart_empty'
             sessions[session_id] = (session, browser, page, state)
             return SessionOutput(
@@ -209,6 +214,53 @@ async def get_cart(session_id: str):
                     'deliver_time_texts': deliver_time_texts,
                 },
             )
+    except KeyError:
+        raise HTTPException(state_code=404, detail='session not found')
+
+@app.post('/sessions/{session_id}/checkout', response_model=SessionOutput)
+async def checkout_session(session_id: str):
+    try:
+        session, browser, page, state = sessions[session_id]
+        await page.click('//button[contains(@class, "to-check")]')
+        await page.wait_for_timeout(2000)
+        await page.click('button.btn-pay')
+        await page.wait_for_timeout(500)
+        await page.click('p:text("支付宝")')
+        await page.wait_for_timeout(500)
+        await page.click('button.sure')
+        await page.wait_for_timeout(5000)
+        payment_page: Page = browser.pages[1]
+        screenshot = await payment_page.screenshot(full_page=True)
+        bytes_as_np_array = np.frombuffer(screenshot, dtype=np.uint8)
+        img = cv2.imdecode(bytes_as_np_array, cv2.IMREAD_ANYCOLOR)
+        qr_data, bbox, rectified_image = qr_decoder.detectAndDecode(img)
+        # if len(qr_data) > 0:
+        #     rectified_image = np.uint8(rectified_image)
+        #     cv2.startWindowThread()
+        #     cv2.imshow('qr', rectified_image)
+        #     cv2.waitKey()
+        state = 'payment_triggered'
+        metadata = {'payment_qr_url': qr_data}
+        sessions[session_id] = (session, browser, page, state)
+        # await page.wait_for_timeout(1000)
+        # await page.click('div.payFooterContainer > button.sure') # on success
+        # await page.click('div.payFooterContainer > button.defaultBtn') # on failure
+        return SessionOutput(id=session_id, state=state, metadata=metadata)
+    except KeyError:
+        raise HTTPException(state_code=404, detail='session not found')
+
+@app.post('/sessions/{session_id}/checkout/success', response_model=SessionOutput)
+async def checkout_session_success(session_id: str):
+    try:
+        session, browser, page, state = sessions[session_id]
+        payment_page: Page = browser.pages[1]
+        await payment_page.close()
+        await page.wait_for_timeout(1000)
+        await page.click('div.payFooterContainer > button.sure') # on success
+        # await page.click('div.payFooterContainer > button.defaultBtn') # on failure
+        state = 'payment_success'
+        sessions[session_id] = (session, browser, page, state)
+        return SessionOutput(id=session_id, state=state)
     except KeyError:
         raise HTTPException(state_code=404, detail='session not found')
 
