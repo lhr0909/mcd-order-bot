@@ -15,6 +15,7 @@ fastapi = "^0.63.0"
 uvicorn = {extras = ["standard"], version = "^0.13.4"}
 wechatpy = "^1.8.14"
 shortuuid = "^1.0.1"
+opencv-python = "^4.5.1"
 
 [tool.poetry.dev-dependencies]
 
