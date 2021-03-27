@@ -7,13 +7,15 @@ pipeline:
     intent_tokenization_flag: false
     # Symbol on which intent should be split
     intent_split_symbol: "_"
-  - name: "components.lm_featurizer.LanguageModelFeaturizer"
+  - name: "nlu.lm_featurizer.LanguageModelFeaturizer"
     model_name: "bert"
     # model_weights: "bert-base-chinese"
     # model_weights: "./bert-models/chinese_wwm_ext_pytorch"
     model_weights: hfl/chinese-bert-wwm-ext
     from_pt: true
     cache_dir: "./cache"
+  - name: "nlu.recognizers_service_extractor.RecognizersServiceEntityExtractor"
+    culture: 'zh-cn'
   - name: "RegexFeaturizer"
   - name: "LexicalSyntacticFeaturizer"
   - name: "CountVectorsFeaturizer"
@@ -28,5 +30,6 @@ pipeline:
 policies:
   - name: MemoizationPolicy
   - name: TEDPolicy
+    max_history: 10
     epochs: 100
-  - name: MappingPolicy
+  - name: RulePolicy

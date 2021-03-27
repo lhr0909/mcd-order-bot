@@ -3,6 +3,8 @@
 RASA_DUCKLING_HTTP_URL = http://localhost:8000
 RASA_X_PASSWORD = Qwe123123
 ACTION_ENDPOINT = http://localhost:5055/webhook
+RECOGNIZERS_SERVICE_URL = http://localhost:7000/recognize/number
+API_SERVER_URL = http://localhost:8002
 
 clean:
 	rm -rf models/

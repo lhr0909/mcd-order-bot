@@ -1,164 +1,71 @@
-version: '2.0'
+version: "2.0"
 stories:
-  - story: Happy Path + Force McD's
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: no_mcd
-      - action: utter_mcd_only
-  - story: Happy Path + Order more
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: affirm
-      - action: utter_ask_order
-      - intent: order
-      - action: utter_announce_ordered
-      - intent: order
-      - action: utter_announce_ordered
-  - story: Happy Path + order anything + Order more
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: affirm
-      - action: utter_ask_order
-      - intent: order_anything
-      - action: utter_acknowledge_order_anything
-      - intent: order
-      - action: utter_announce_ordered
-  - story: Happy Path + Force McD's + Order more
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: no_mcd
-      - action: utter_mcd_only
-      - intent: order
-      - action: utter_announce_ordered
-      - intent: order
-      - action: utter_announce_ordered
-  - story: Happy Path + Force McD's + order anything + Order more
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: no_mcd
-      - action: utter_mcd_only
-      - intent: order_anything
-      - action: utter_acknowledge_order_anything
-      - intent: order
-      - action: utter_announce_ordered
-  - story: Happy Path + order anything
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: affirm
-      - action: utter_ask_order
-      - intent: order
-      - action: utter_announce_ordered
-      - intent: order_anything
-      - action: utter_acknowledge_order_anything
-  - story: Happy Path + order anything
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: affirm
-      - action: utter_ask_order
-      - intent: order_anything
-      - action: utter_acknowledge_order_anything
-  - story: Happy Path + Force McD's + order anything
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: no_mcd
-      - action: utter_mcd_only
-      - intent: order
-      - action: utter_announce_ordered
-      - intent: order_anything
-      - action: utter_acknowledge_order_anything
-  - story: Happy Path + Force McD's + order anything
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: no_mcd
-      - action: utter_mcd_only
-      - intent: order_anything
-      - action: utter_acknowledge_order_anything
-  - story: Happy Path + Check Cart
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: affirm
-      - action: utter_ask_order
-      - intent: order
-      - action: utter_announce_ordered
-      - intent: check_cart
-      - action: utter_cart_status
-  - story: Happy Path + order anything + Check Cart
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: affirm
-      - action: utter_ask_order
-      - intent: order_anything
-      - action: utter_acknowledge_order_anything
-      - intent: check_cart
-      - action: utter_cart_status
-  - story: Happy Path + Force McD's + Check Cart
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: no_mcd
-      - action: utter_mcd_only
-      - intent: order
-      - action: utter_announce_ordered
-      - intent: check_cart
-      - action: utter_cart_status
-  - story: Happy Path + Force McD's + order anything + Check Cart
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: no_mcd
-      - action: utter_mcd_only
-      - intent: order_anything
-      - action: utter_acknowledge_order_anything
-      - intent: check_cart
-      - action: utter_cart_status
-  - story: Happy Path
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: affirm
-      - action: utter_ask_order
-      - intent: order
-      - action: utter_announce_ordered
-      - intent: confirm_order
-      - action: utter_announce_order_status
-  - story: Happy Path + order anything
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: affirm
-      - action: utter_ask_order
-      - intent: order_anything
-      - action: utter_acknowledge_order_anything
-      - intent: confirm_order
-      - action: utter_announce_order_status
-  - story: Happy Path + Force McD's
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: no_mcd
-      - action: utter_mcd_only
-      - intent: order
-      - action: utter_announce_ordered
-      - intent: confirm_order
-      - action: utter_announce_order_status
-  - story: Happy Path + Force McD's + order anything
-    steps:
-      - intent: i_am_hungry
-      - action: utter_ask_mcd
-      - intent: no_mcd
-      - action: utter_mcd_only
-      - intent: order_anything
-      - action: utter_acknowledge_order_anything
-      - intent: confirm_order
-      - action: utter_announce_order_status
+- story: Happy Order Path
+  steps:
+  - intent: i_am_hungry
+  - action: utter_ask_mcd
+  - intent: affirm
+  - action: action_login
+  - slot_was_set:
+    - state: logged_in
+  - action: utter_ask_order
+- story: Force McD Path
+  steps:
+  - intent: i_am_hungry
+  - action: utter_ask_mcd
+  - intent: deny
+  - action: utter_mcd_only
+  - action: action_login
+  - slot_was_set:
+    - state: logged_in
+  - action: utter_ask_order
+- story: Force McD Path 2
+  steps:
+  - intent: i_am_hungry
+  - action: utter_ask_mcd
+  - intent: no_mcd
+  - action: utter_mcd_only
+  - slot_was_set:
+    - state: logged_in
+  - action: utter_ask_order
+- story: Normal Order Path
+  steps:
+  - intent: order
+  - action: action_order
+  - slot_was_set:
+    - state: ordered
+  - action: utter_anything_else
+- story: Order Anything Path
+  steps:
+  - intent: order_anything
+  - action: utter_acknowledge_order_anything
+  - action: action_order
+  - slot_was_set:
+    - state: ordered
+  - action: utter_anything_else
+- story: Check Cart
+  steps:
+  - intent: check_cart
+  - action: action_check_cart
+  - action: utter_anything_else
+- story: Clear Cart
+  steps:
+  - intent: clear_cart
+  - action: action_clear_cart
+  - slot_was_set:
+    - state: cart_cleared
+  - action: utter_anything_else
+- story: Checkout + Payment Success Path
+  steps:
+  - intent: confirm_order
+  - action: action_check_cart
+  - slot_was_set:
+    - state: cart_viewed
+  - action: action_checkout
+  - slot_was_set:
+    - state: payment_triggered
+  - intent: payment_success
+  - action: action_payment_success
+  - slot_was_set:
+    - state: payment_success
+  - action: action_restart

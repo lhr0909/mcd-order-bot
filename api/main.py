@@ -16,6 +16,7 @@ qr_decoder = cv2.QRCodeDetector()
 sessions: Dict[str, Tuple[Playwright, Browser, Page, str]] = {}
 
 class SessionInput(BaseModel):
+    session_id: Optional[str] = None
     phone: str
 
 class LoginInput(BaseModel):
@@ -37,7 +38,7 @@ async def root():
 
 @app.post('/sessions', response_model=SessionOutput)
 async def create_session(input: SessionInput):
-    session_id = 'test'
+    session_id = input.session_id if input.session_id is not None else 'test'
     # session_id = shortuuid.uuid()
     session = await playwright.start()
     browser = await session.chromium.launch_persistent_context(
@@ -123,7 +124,7 @@ async def order_session(session_id: str, input: OrderInput):
                 await page.click('button.to-cart')
                 await page.wait_for_timeout(1000)
                 await page.click('div:text("餐品菜单")')
-                items.append({'name': item_title, 'quantity': 1})
+                items.append({'name': item_title, 'quantity': input.quantity})
         else:
             result_count = await page.eval_on_selector_all(
                 '//div[@class="buy-box"]/div[@class="left"]/p',
@@ -208,7 +209,7 @@ async def get_session_cart(session_id: str):
                 id=session_id,
                 state=state,
                 metadata={
-                    'items': tuple(zip(item_titles, item_quantities)),
+                    'items': list(map(lambda item: { "name": item[0], "quantity": item[1] }, zip(item_titles, item_quantities))),
                     'cart_price_texts': cart_price_texts,
                     'address_texts': address_texts,
                     'deliver_time_texts': deliver_time_texts,

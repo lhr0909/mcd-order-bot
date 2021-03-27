@@ -28,6 +28,7 @@ nlu:
     - 来一个[麦香鱼]{"entity": "item"}
     - 我想要[麦辣鸡翅]{"entity": "item"}
     - 点三个[板烧鸡腿堡套餐]{"entity": "item"}
+    - 给我来四份[猪柳蛋麦满分套餐]{"entity": "item"}
     - 要三杯[可乐]{"entity": "item"}和一份[那么大鸡排]{"entity": "item"}
 - intent: confirm_order
   examples: |
@@ -56,3 +57,16 @@ nlu:
     - 点了哪些东西
     - 购物车里都有啥
     - 购物车里点了些什么
+- intent: clear_cart
+  examples: |
+    - 清空购物车
+    - 重新来
+    - 我要重新点
+    - 重新点单
+- intent: payment_success
+  examples: |
+    - 钱我付了
+    - 我支付了
+    - 我已经支付了
+    - 钱已经扣了
+    - 我交钱了

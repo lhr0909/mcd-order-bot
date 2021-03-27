@@ -14,21 +14,32 @@ intents:
 - order:
     use_entities: true
 - order_anything:
-    use_entities: []
+    use_entities: true
 - check_cart:
     use_entities: []
 - confirm_order:
     use_entities: []
-- fallback:
-    use_entities: []
 - deny:
-    use_entities: true
+    use_entities: []
+- clear_cart:
+    use_entities: []
 entities:
+- number
 - item
 slots:
   item:
     type: rasa.shared.core.slots.TextSlot
     initial_value: null
+    auto_fill: true
+    influence_conversation: false
+  metadata:
+    type: rasa.shared.core.slots.AnySlot
+    initial_value: null
+    auto_fill: true
+    influence_conversation: false
+  state:
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: not_started
     auto_fill: true
     influence_conversation: true
 responses:
@@ -37,25 +48,42 @@ responses:
   utter_mcd_only:
   - text: 但我现在也只会点麦当劳，您就将就一下吧
   utter_ask_order:
-  - text: 我这边刚登录了麦当劳官网，今天想吃点什么呢？
+  - text: 我刚登录了麦当劳官网，今天想吃点什么呢？
   utter_announce_ordered:
-  - text: 好的，给你点了一份麦辣鸡腿汉堡中套餐。
-  - text: 好的，这边下单了一份麦乐鸡5块
-  - text: 给你点了一份平板支撑套餐。
+  - text: 好的，给你点了{content}。
+  - text: 好，这边下单了{content}。
+  - text: 给你点了{content}。
   utter_anything_else:
   - text: 还需要其他吗？
+  - text: 还要点别的吗？
+  - text: 亲，可以下单了吗？
+  - text: 还有什么别的需要吗？
   utter_acknowledge_order_anything:
   - text: 那好的，不好吃的话也要吃完哦。
   utter_cart_status:
-  - text: 目前给你点了一份麦辣鸡腿汉堡中套餐，一份平板支撑套餐，一份麦乐鸡5块。
-  utter_announce_order_status:
-  - text: 好的，我已经给你下单了一份麦辣鸡腿汉堡中套餐，预计将会今天在12点07分送到你在XX市XX区的地址。
+  - text: 目前给你点了{content}。
+  utter_announce_order:
+  - text: 好的，我已经给你下单了{content}。
+  utter_address_and_eta:
+  - text: 预计将会在{eta}送到你在{address}的地址。
   utter_remind_payment:
   - text: 另外给你手机发送了支付信息，请及时支付。
   utter_complete:
   - text: 吃好喝好才最重要，千万不能饿了自己。
   utter_fallback:
-  - text: 我没搞懂你说的意思，可以再说一遍吗？
-actions: []
+  - text: 我没搞懂你说的意思，可以告诉我你想吃什么吗？
+  utter_cart_cleared:
+  - text: 当前购物车已经清空了。
+  utter_cart_empty:
+  - text: 当前的购物车是空的。
+  utter_please_order:
+  - text: 您要点了东西我才能下单。
+actions:
+- action_login
+- action_order
+- action_check_cart
+- action_clear_cart
+- action_checkout
+- action_payment_success
 forms: {}
 e2e_actions: []

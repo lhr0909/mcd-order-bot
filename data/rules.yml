@@ -1,5 +1,11 @@
 rules:
-  - rule: out-of-scope
+  # - rule: out-of-scope
+  #   steps:
+  #   - intent: fallback
+  #   - action: utter_fallback
+  - rule: handle order_failed
+    condition:
+    - slot_was_set:
+      - state: 'order_failed'
     steps:
-      - intent: fallback
-      - action: utter_fallback
+    - action: utter_fallback

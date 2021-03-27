@@ -6,6 +6,11 @@ services:
   #   restart: always
   #   ports:
   #     - 8000:8000
+  recognizers-service:
+    image: xanthoustech/recognizers-service:latest
+    restart: always
+    ports:
+      - 7000:7000
   rasa-chinese-service:
     # build: .
     image: xanthoustech/rasa-chinese-service:latest
