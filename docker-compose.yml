@@ -8,7 +8,7 @@ services:
   #     - 8000:8000
   rasa-chinese-service:
     # build: .
-    image: rasa-chinese-service:latest
+    image: xanthoustech/rasa-chinese-service:latest
     ports:
       - 8001:8000
     volumes:

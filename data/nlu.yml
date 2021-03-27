@@ -1,27 +1,58 @@
-version: '2.0'
-
+version: "2.0"
 nlu:
-  - intent: greet
-    examples: |
-      - 你好
-      - 你好吗
-      - 在吗
-      - 早上好
-      - 晚上好
-  - intent: goodbye
-    examples: |
-      - 再见
-      - 拜拜
-  - intent: affirm
-    examples: |
-      - 是
-      - 是的
-      - 对的
-      - 好的
-      - 没错
-  - intent: deny
-    examples: |
-      - 不
-      - 不是
-      - 没有
-      - 不对
+- intent: affirm
+  examples: |
+    - 是
+    - 是的
+    - 对的
+    - 好的
+    - 没错
+    - 可以啊
+    - 好啊
+- intent: deny
+  examples: |
+    - 不
+    - 不是
+    - 没有
+    - 不对
+    - 不要
+- intent: i_am_hungry
+  examples: |
+    - 我饿了
+    - 我太饿了
+- intent: order
+  examples: |
+    - 给我来一份[麦辣鸡腿堡套餐]{"entity": "item"}
+    - 我还想再点一份[麦乐鸡]{"entity": "item"}
+    - 点一个[巨无霸]{"entity": "item"}
+    - 来一个[麦香鱼]{"entity": "item"}
+    - 我想要[麦辣鸡翅]{"entity": "item"}
+    - 点三个[板烧鸡腿堡套餐]{"entity": "item"}
+    - 要三杯[可乐]{"entity": "item"}和一份[那么大鸡排]{"entity": "item"}
+- intent: confirm_order
+  examples: |
+    - 就这么多，下单吧
+    - 可以了，下单吧
+    - 下单
+    - 确认下单
+- intent: no_mcd
+  examples: |
+    - 我不想吃麦当劳
+    - 今天咱不吃麦当劳了吧
+    - 今天别点麦当劳了
+    - 我不要麦当劳
+- intent: order_anything
+  examples: |
+    - 你点什么我就吃什么
+    - 随便给我点一个
+    - 随便给我点什么都行
+    - 你拿主意吧
+    - 随便点一些好吃的就行
+    - 随便点两份[套餐]{"entity": "item"}吧
+- intent: check_cart
+  examples: |
+    - 现在都点了啥
+    - 我们都点了什么
+    - 点了哪些东西
+    - 购物车里都有啥
+    - 购物车里点了些什么

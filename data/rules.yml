@@ -1,0 +1,5 @@
+rules:
+  - rule: out-of-scope
+    steps:
+      - intent: fallback
+      - action: utter_fallback

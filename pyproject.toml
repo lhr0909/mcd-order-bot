@@ -4,11 +4,14 @@ version = "0.1.0"
 description = ""
 authors = ["Simon Liang <simon@x-tech.io>"]
 
+[[tool.poetry.source]]
+name = 'private'
+url = 'https://pypi.rasa.com/simple'
+
 [tool.poetry.dependencies]
 python = ">=3.7,<3.9"
 rasa = {extras = ["transformers"], version = "^2.2.2"}
 transformers = {version = "2.11.0", extras = ["tf-cpu", "torch"]}
-# jieba = "^0.42.1"
 rasa_chinese = "^2.2.0"
 playwright = "1.8.0a1"
 fastapi = "^0.63.0"
@@ -16,6 +19,7 @@ uvicorn = {extras = ["standard"], version = "^0.13.4"}
 wechatpy = "^1.8.14"
 shortuuid = "^1.0.1"
 opencv-python = "^4.5.1"
+rasa-x = "^0.38.1"
 
 [tool.poetry.dev-dependencies]
 

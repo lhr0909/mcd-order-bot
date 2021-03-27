@@ -1,0 +1,61 @@
+version: '2.0'
+config:
+  store_entities_as_slots: true
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
+intents:
+- i_am_hungry:
+    use_entities: []
+- no_mcd:
+    use_entities: []
+- affirm:
+    use_entities: []
+- order:
+    use_entities: true
+- order_anything:
+    use_entities: []
+- check_cart:
+    use_entities: []
+- confirm_order:
+    use_entities: []
+- fallback:
+    use_entities: []
+- deny:
+    use_entities: true
+entities:
+- item
+slots:
+  item:
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
+    influence_conversation: true
+responses:
+  utter_ask_mcd:
+  - text: 你想吃麦当劳吗？
+  utter_mcd_only:
+  - text: 但我现在也只会点麦当劳，您就将就一下吧
+  utter_ask_order:
+  - text: 我这边刚登录了麦当劳官网，今天想吃点什么呢？
+  utter_announce_ordered:
+  - text: 好的，给你点了一份麦辣鸡腿汉堡中套餐。
+  - text: 好的，这边下单了一份麦乐鸡5块
+  - text: 给你点了一份平板支撑套餐。
+  utter_anything_else:
+  - text: 还需要其他吗？
+  utter_acknowledge_order_anything:
+  - text: 那好的，不好吃的话也要吃完哦。
+  utter_cart_status:
+  - text: 目前给你点了一份麦辣鸡腿汉堡中套餐，一份平板支撑套餐，一份麦乐鸡5块。
+  utter_announce_order_status:
+  - text: 好的，我已经给你下单了一份麦辣鸡腿汉堡中套餐，预计将会今天在12点07分送到你在XX市XX区的地址。
+  utter_remind_payment:
+  - text: 另外给你手机发送了支付信息，请及时支付。
+  utter_complete:
+  - text: 吃好喝好才最重要，千万不能饿了自己。
+  utter_fallback:
+  - text: 我没搞懂你说的意思，可以再说一遍吗？
+actions: []
+forms: {}
+e2e_actions: []
