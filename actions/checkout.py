@@ -36,7 +36,7 @@ class CheckoutAction(Action):
 
         if result[SLOT_STATE] == 'payment_triggered':
             dispatcher.utter_message(template="utter_remind_payment", json_message={
-                "url": result[SLOT_METADATA].get('payment_qr_url'),
+                "url": "alipayqr://platformapi/startapp?saId=10000007&clientVersion=3.7.0.0718&qrcode=" + result[SLOT_METADATA].get('payment_qr_url'),
             })
 
         return events

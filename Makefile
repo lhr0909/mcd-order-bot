@@ -15,6 +15,9 @@ train:
 shell:
 	poetry run rasa shell $(args)
 
+server:
+	poetry run rasa run --enable-api $(args)
+
 apiserver:
 	poetry run uvicorn api.main:app --host 0.0.0.0 --port 8002 --loop asyncio --reload --reload-dir api
 

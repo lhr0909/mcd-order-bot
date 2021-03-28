@@ -12,9 +12,9 @@ intents:
 - affirm:
     use_entities: []
 - order:
-    use_entities: true
+    use_entities: []
 - order_anything:
-    use_entities: true
+    use_entities: []
 - check_cart:
     use_entities: []
 - confirm_order:
@@ -22,6 +22,8 @@ intents:
 - deny:
     use_entities: []
 - clear_cart:
+    use_entities: []
+- payment_success:
     use_entities: []
 entities:
 - number
