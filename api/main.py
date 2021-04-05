@@ -1,3 +1,5 @@
+import random
+from Levenshtein import distance
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from playwright.async_api import async_playwright, Playwright, Browser, Page
@@ -90,13 +92,17 @@ async def order_session(session_id: str, input: OrderInput):
 
         if input.is_exact is True:
             # loop through the items and try to match the name
-            # titles = await page.eval_on_selector_all(
-            #     '//div[@class="buy-box"]/div[@class="left"]/p',
-            #     '(boxes) => boxes.map(box => box.innerText)',
-            # )
+            titles = await page.eval_on_selector_all(
+                '//div[@class="buy-box"]/div[@class="left"]/p',
+                '(boxes) => boxes.map(box => box.innerText)',
+            )
 
-            # select the first one
-            button_selector = '(//div[@class="buy-box"])[1]/*[contains(@class, "button")]'
+            distances = [distance(input.query, x) for x in titles]
+            item_matches = sorted(zip(titles, distances, range(1, len(titles) + 1)), key=lambda x: x[1])
+            print(item_matches)
+
+            # select the closest one
+            button_selector = f'(//div[@class="buy-box"])[{item_matches[0][2]}]/*[contains(@class, "button")]'
             button_class_dict: Dict[str, str] = await page.eval_on_selector(
                 button_selector,
                 '(button) => button.classList',
@@ -123,16 +129,55 @@ async def order_session(session_id: str, input: OrderInput):
                 await page.wait_for_timeout(500)
                 await page.click('button.to-cart')
                 await page.wait_for_timeout(1000)
-                await page.click('div:text("餐品菜单")')
+                await page.goto('https://mcd.cn/product')
+                # await page.click('div:text("餐品菜单")')
                 items.append({'name': item_title, 'quantity': input.quantity})
         else:
             result_count = await page.eval_on_selector_all(
                 '//div[@class="buy-box"]/div[@class="left"]/p',
                 '(boxes) => boxes.length',
             )
+
             # pick one at random
-            print(result_count)
-            # items.append({'name': name, 'quantity': 1})
+            item_idx = random.sample(range(1, result_count + 1), input.quantity)
+
+            for idx in item_idx:
+                button_selector = f'(//div[@class="buy-box"])[{idx}]/*[contains(@class, "button")]'
+                button_class_dict: Dict[str, str] = await page.eval_on_selector(
+                    button_selector,
+                    '(button) => button.classList',
+                )
+
+                if 'custom' not in button_class_dict.values():
+                    # just click on the button
+                    await page.click(button_selector, click_count=1)
+                    item_title = await page.eval_on_selector(
+                        '(//div[@class="buy-box"])[1]/div[@class="left"]/p',
+                        '(title) => title.innerText',
+                    )
+                    items.append({'name': item_title, 'quantity': 1})
+                else:
+                    # go into customization
+                    await page.click(button_selector)
+                    await page.wait_for_timeout(500)
+                    # get the first sub-item
+                    item_title = await page.eval_on_selector(
+                        '(//h1[@class="title"])[1]',
+                        '(title) => title.innerText',
+                    )
+                    await page.fill('//input[contains(@class, "count")]', '1')
+                    await page.wait_for_timeout(500)
+                    await page.click('button.to-cart')
+                    await page.wait_for_timeout(1000)
+                    items.append({'name': item_title, 'quantity': 1})
+
+                    # await page.click('div:text("餐品菜单")')
+                    await page.goto('https://mcd.cn/product')
+
+                    await page.wait_for_timeout(2000)
+                    await page.fill('//input[contains(@placeholder, "最多")]', input.query)
+                    await page.click('button.ant-input-search-button')
+                    await page.wait_for_timeout(1000)
 
         state = 'ordered'
         metadata = {'items': items}

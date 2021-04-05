@@ -3,9 +3,17 @@ rules:
   #   steps:
   #   - intent: fallback
   #   - action: utter_fallback
-  - rule: handle order_failed
-    condition:
-    - slot_was_set:
-      - state: 'order_failed'
-    steps:
-    - action: utter_fallback
+- rule: handle order_failed
+  condition:
+  - slot_was_set:
+    - state: 'order_failed'
+  steps:
+  - action: utter_fallback
+- rule: Direct McD Path
+  conversation_start: true
+  steps:
+  - intent: mcd
+  - action: action_login
+  - slot_was_set:
+    - state: logged_in
+  - action: utter_ask_order

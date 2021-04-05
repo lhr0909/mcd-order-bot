@@ -27,11 +27,10 @@ class OrderAction(Action):
 
         logger.debug(intent_name)
 
+        is_exact = True
+
         if intent_name == 'order_anything':
-            # TODO: order with is_exact = False
-            return [
-                SlotSet(SLOT_STATE, 'order_failed')
-            ]
+            is_exact = False
 
         entities = tracker.latest_message.get('entities', [])
 
@@ -69,7 +68,7 @@ class OrderAction(Action):
             response = await requests.post(url(f'/sessions/{session_id}/order'), json={
                 "query": order_item[0],
                 "quantity": quantity if quantity > 0 else 1,
-                "is_exact": True,
+                "is_exact": is_exact,
             })
 
             result = await response.json()

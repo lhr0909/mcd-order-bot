@@ -7,6 +7,8 @@ session_config:
 intents:
 - i_am_hungry:
     use_entities: []
+- mcd:
+    use_entities: []
 - no_mcd:
     use_entities: []
 - affirm:
@@ -62,10 +64,13 @@ responses:
   - text: 还有什么别的需要吗？
   utter_acknowledge_order_anything:
   - text: 那好的，不好吃的话也要吃完哦。
+  - text: 好的，如果不喜欢的话可以清空购物车重新点。
   utter_cart_status:
   - text: 目前给你点了{content}。
   utter_announce_order:
   - text: 好的，我已经给你下单了{content}。
+  utter_confirm_checkout:
+  - text: 好的，现在给您下单。
   utter_address_and_eta:
   - text: 预计将会在{eta}送到你在{address}的地址。
   utter_remind_payment:

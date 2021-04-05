@@ -55,7 +55,7 @@ stories:
   - slot_was_set:
     - state: cart_cleared
   - action: utter_anything_else
-- story: Checkout + Payment Success Path
+- story: Checkout + Read Order + Payment Success Path
   steps:
   - intent: confirm_order
   - action: action_check_cart
@@ -69,3 +69,13 @@ stories:
   - slot_was_set:
     - state: payment_success
   - action: action_restart
+- story: Checkout with no read order
+  steps:
+  - intent: check_cart
+  - action: action_check_cart
+  - slot_was_set:
+    - state: cart_viewed
+  - action: utter_anything_else
+  - intent: confirm_order
+  - action: utter_confirm_checkout
+  - action: action_checkout

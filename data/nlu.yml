@@ -20,6 +20,13 @@ nlu:
   examples: |
     - 我饿了
     - 我太饿了
+- intent: mcd
+  examples: |
+    - 我想吃麦当劳
+    - 给我点麦当劳吧
+    - 我想吃金拱门
+    - 帮我叫麦当劳
+    - 我要金拱门
 - intent: order
   examples: |
     - 给我来一份[麦辣鸡腿堡套餐]{"entity": "item"}
@@ -28,6 +35,7 @@ nlu:
     - 来一个[麦香鱼]{"entity": "item"}
     - 我想要[麦辣鸡翅]{"entity": "item"}
     - 点三个[板烧鸡腿堡套餐]{"entity": "item"}
+    - 给我点两个[双层吉士汉堡套餐]{"entity": "item"}
     - 给我来四份[猪柳蛋麦满分套餐]{"entity": "item"}
     - 要三杯[可乐]{"entity": "item"}和一份[那么大鸡排]{"entity": "item"}
 - intent: confirm_order
