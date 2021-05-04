@@ -47,6 +47,10 @@ async def create_session(input: SessionInput):
         headless=False,
         user_data_dir='./browsercache',
         devtools=True,
+        viewport={
+            'width': 1600,
+            'height': 900,
+        },
     )
     page = browser.pages[0]
     # page = await browser.new_page()
@@ -101,37 +105,38 @@ async def order_session(session_id: str, input: OrderInput):
             item_matches = sorted(zip(titles, distances, range(1, len(titles) + 1)), key=lambda x: x[1])
             print(item_matches)
 
-            # select the closest one
-            button_selector = f'(//div[@class="buy-box"])[{item_matches[0][2]}]/*[contains(@class, "button")]'
-            button_class_dict: Dict[str, str] = await page.eval_on_selector(
-                button_selector,
-                '(button) => button.classList',
-            )
+            if len(item_matches) > 0:
+                # select the closest one
+                button_selector = f'(//div[@class="buy-box"])[{item_matches[0][2]}]/*[contains(@class, "button")]'
+                button_class_dict: Dict[str, str] = await page.eval_on_selector(
+                    button_selector,
+                    '(button) => button.classList',
+                )
 
-            if 'custom' not in button_class_dict.values():
-                # just click on the button
-                await page.click(button_selector, click_count=input.quantity)
-                item_title = await page.eval_on_selector(
-                    '(//div[@class="buy-box"])[1]/div[@class="left"]/p',
-                    '(title) => title.innerText',
-                )
-                items.append({'name': item_title, 'quantity': input.quantity})
-            else:
-                # go into customization
-                await page.click(button_selector)
-                await page.wait_for_timeout(500)
-                # get the first sub-item
-                item_title = await page.eval_on_selector(
-                    '(//h1[@class="title"])[1]',
-                    '(title) => title.innerText',
-                )
-                await page.fill('//input[contains(@class, "count")]', str(input.quantity))
-                await page.wait_for_timeout(500)
-                await page.click('button.to-cart')
-                await page.wait_for_timeout(1000)
-                await page.goto('https://mcd.cn/product')
-                # await page.click('div:text("餐品菜单")')
-                items.append({'name': item_title, 'quantity': input.quantity})
+                if 'custom' not in button_class_dict.values():
+                    # just click on the button
+                    await page.click(button_selector, click_count=input.quantity)
+                    item_title = await page.eval_on_selector(
+                        '(//div[@class="buy-box"])[1]/div[@class="left"]/p',
+                        '(title) => title.innerText',
+                    )
+                    items.append({'name': item_title, 'quantity': input.quantity})
+                else:
+                    # go into customization
+                    await page.click(button_selector)
+                    await page.wait_for_timeout(500)
+                    # get the first sub-item
+                    item_title = await page.eval_on_selector(
+                        '(//h1[@class="title"])[1]',
+                        '(title) => title.innerText',
+                    )
+                    await page.fill('//input[contains(@class, "count")]', str(input.quantity))
+                    await page.wait_for_timeout(500)
+                    await page.click('button.to-cart')
+                    await page.wait_for_timeout(1000)
+                    await page.goto('https://mcd.cn/product')
+                    # await page.click('div:text("餐品菜单")')
+                    items.append({'name': item_title, 'quantity': input.quantity})
         else:
             result_count = await page.eval_on_selector_all(
                 '//div[@class="buy-box"]/div[@class="left"]/p',
@@ -295,15 +300,47 @@ async def checkout_session(session_id: str):
     except KeyError:
         raise HTTPException(state_code=404, detail='session not found')
 
+@app.post('/sessions/{session_id}/checkout/retry', response_model=SessionOutput)
+async def checkout_session_retry(session_id: str):
+    try:
+        session, browser, page, state = sessions[session_id]
+        if len(browser.pages) > 1:
+            payment_page: Page = browser.pages[1]
+            screenshot = await payment_page.screenshot(full_page=True)
+            bytes_as_np_array = np.frombuffer(screenshot, dtype=np.uint8)
+            img = cv2.imdecode(bytes_as_np_array, cv2.IMREAD_ANYCOLOR)
+            qr_data, bbox, rectified_image = qr_decoder.detectAndDecode(img)
+            state = 'payment_triggered'
+            metadata = {'payment_qr_url': qr_data}
+            sessions[session_id] = (session, browser, page, state)
+            return SessionOutput(id=session_id, state=state)
+        else:
+            await page.click('div.payFooterContainer > button.defaultBtn') # on failure
+            await page.wait_for_timeout(500)
+            await page.click('button.sure')
+            await page.wait_for_timeout(5000)
+            payment_page: Page = browser.pages[1]
+            screenshot = await payment_page.screenshot(full_page=True)
+            bytes_as_np_array = np.frombuffer(screenshot, dtype=np.uint8)
+            img = cv2.imdecode(bytes_as_np_array, cv2.IMREAD_ANYCOLOR)
+            qr_data, bbox, rectified_image = qr_decoder.detectAndDecode(img)
+            state = 'payment_triggered'
+            metadata = {'payment_qr_url': qr_data}
+            sessions[session_id] = (session, browser, page, state)
+            return SessionOutput(id=session_id, state=state)
+    except KeyError:
+        raise HTTPException(state_code=404, detail='session not found')
+
 @app.post('/sessions/{session_id}/checkout/success', response_model=SessionOutput)
 async def checkout_session_success(session_id: str):
     try:
         session, browser, page, state = sessions[session_id]
-        payment_page: Page = browser.pages[1]
-        await payment_page.close()
-        await page.wait_for_timeout(1000)
-        await page.click('div.payFooterContainer > button.sure') # on success
-        # await page.click('div.payFooterContainer > button.defaultBtn') # on failure
+        if len(browser.pages) > 1:
+            payment_page: Page = browser.pages[1]
+            await payment_page.close()
+            await page.wait_for_timeout(1000)
+            await page.click('div.payFooterContainer > button.sure') # on success
+            # await page.click('div.payFooterContainer > button.defaultBtn') # on failure
         state = 'payment_success'
         sessions[session_id] = (session, browser, page, state)
         return SessionOutput(id=session_id, state=state)

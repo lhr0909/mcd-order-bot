@@ -13,9 +13,9 @@ from . import url, SLOT_STATE, SLOT_METADATA
 logger = logging.getLogger(__name__)
 
 
-class CheckoutAction(Action):
+class RetryPaymentAction(Action):
     def name(self) -> Text:
-        return "action_checkout"
+        return "action_retry_payment"
 
     async def run(
         self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
@@ -23,7 +23,7 @@ class CheckoutAction(Action):
         session_id = tracker.sender_id
 
         events = []
-        response = await requests.post(url(f'/sessions/{session_id}/checkout'))
+        response = await requests.post(url(f'/sessions/{session_id}/checkout/success'))
 
         result = await response.json()
         logger.debug(result)
@@ -35,11 +35,8 @@ class CheckoutAction(Action):
             events.append(SlotSet(SLOT_METADATA, result[SLOT_METADATA]))
 
         if result[SLOT_STATE] == 'payment_triggered':
-            # dispatcher.utter_message(template="utter_remind_payment", json_message={
-            #     "url": "alipayqr://platformapi/startapp?saId=10000007&clientVersion=3.7.0.0718&qrcode=" + result[SLOT_METADATA].get('payment_qr_url'),
-            # })
             dispatcher.utter_message(template="utter_remind_payment", json_message={
-                "url": result[SLOT_METADATA].get('payment_qr_url'),
+                "url": "alipayqr://platformapi/startapp?saId=10000007&clientVersion=3.7.0.0718&qrcode=" + result[SLOT_METADATA].get('payment_qr_url'),
             })
 
         return events

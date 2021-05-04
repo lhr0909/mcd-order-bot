@@ -71,6 +71,11 @@ nlu:
     - 重新来
     - 我要重新点
     - 重新点单
+- intent: retry_payment
+  examples: |
+    - 发一下支付码
+    - 重新支付
+    - 没收到支付码
 - intent: payment_success
   examples: |
     - 钱我付了

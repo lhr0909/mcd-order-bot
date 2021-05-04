@@ -79,3 +79,24 @@ stories:
   - intent: confirm_order
   - action: utter_confirm_checkout
   - action: action_checkout
+- story: Checkout with payment_retry
+  steps:
+  - intent: check_cart
+  - action: action_check_cart
+  - slot_was_set:
+    - state: cart_viewed
+  - action: utter_anything_else
+  - intent: confirm_order
+  - action: utter_confirm_checkout
+  - action: action_checkout
+  - slot_was_set:
+    - state: payment_triggered
+  - intent: retry_payment
+  - action: action_retry_payment
+  - slot_was_set:
+    - state: payment_triggered
+  - intent: payment_success
+  - action: action_payment_success
+  - slot_was_set:
+    - state: payment_success
+  - action: action_restart

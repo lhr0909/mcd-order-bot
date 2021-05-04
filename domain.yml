@@ -14,9 +14,9 @@ intents:
 - affirm:
     use_entities: []
 - order:
-    use_entities: []
+    use_entities: true
 - order_anything:
-    use_entities: []
+    use_entities: true
 - check_cart:
     use_entities: []
 - confirm_order:
@@ -24,6 +24,8 @@ intents:
 - deny:
     use_entities: []
 - clear_cart:
+    use_entities: []
+- retry_payment:
     use_entities: []
 - payment_success:
     use_entities: []
@@ -74,7 +76,7 @@ responses:
   utter_address_and_eta:
   - text: 预计将会在{eta}送到你在{address}的地址。
   utter_remind_payment:
-  - text: 另外给你手机发送了支付信息，请及时支付。
+  - text: 我给您的手机发送了支付信息，请及时支付。
   utter_complete:
   - text: 吃好喝好才最重要，千万不能饿了自己。
   utter_fallback:
@@ -92,5 +94,6 @@ actions:
 - action_clear_cart
 - action_checkout
 - action_payment_success
+- action_retry_payment
 forms: {}
 e2e_actions: []

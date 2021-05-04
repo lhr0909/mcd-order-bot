@@ -23,7 +23,7 @@ class PaymentSuccessAction(Action):
         session_id = tracker.sender_id
 
         events = []
-        response = await requests.post(url(f'/sessions/{session_id}/checkout/success'))
+        response = await requests.post(url(f'/sessions/{session_id}/checkout/retry'))
 
         result = await response.json()
         logger.debug(result)
