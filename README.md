@@ -50,7 +50,7 @@ make train
 模型训练出来之后我们可以在Rasa X里面测试一下：
 
 ```shell
-make actionserver x -j2 # 这个命令会同时运行Action Server和Rasa X
+make apiserver actionserver x -j3 # 这个命令会同时运行API Server, Action Server和Rasa X
 ```
 
 这时候浏览器会打开，只需要等个一两分钟，聊天界面就会出现。需要聊到机器人说“打开了麦当劳的官网”，需要在弹出的浏览器里面登录一下金拱门。这个浏览器会记住登录的状态。理论上可以保持两周。
