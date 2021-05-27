@@ -59,8 +59,11 @@ make apiserver actionserver x -j3 # 这个命令会同时运行API Server, Actio
 
 ## Siri快捷指令
 
-这部分暂时TODO，我需要加一些自动配置项，然后添加共享链接。过两天会加上。
-
+1. 首先下载[我饿了快捷指令](https://www.icloud.com/shortcuts/f74e95a28e934b209ce72f774c8126f0)，然后根据导入问题做配置，遇到最后那个选择快捷指令的导入可以先暂时跳过
+2. 然后下载[Rasa Chatbot快捷指令](https://www.icloud.com/shortcuts/27d85db243c8467491dc85c0ac0fda4e)，根据导入问题做配置，遇到最后一个选择打开支付宝二维码快捷指令的问题可以先暂时跳过
+3. 回到我饿了快捷指令，把最后的运行快捷指令修改成指向Rasa Chatbot快捷指令
+4. 如果是想在Siri使用的话，下载[这个快捷指令](https://www.icloud.com/shortcuts/a5e41709944d49659a716a31ea30718f)，如果想在Homepod使用的话，下载[这个快捷指令](https://www.icloud.com/shortcuts/153fe2db070143b185a0fa999f18f9d5)。打开之后把Rasa Chatbot快捷指令里面，打开URL的快捷指令（在如果url有任何值下面），改成指向你刚刚下载的快捷指令
+5. Homepod使用的话最后下载[这个快捷指令](https://www.icloud.com/shortcuts/50be6eb6fb3247ea867ea2c9f5c311ee)。最后需要用这个快捷指令打开在剪贴板里面的支付宝二维码
 # 开源证书
 
 [MIT](./LICENSE)
